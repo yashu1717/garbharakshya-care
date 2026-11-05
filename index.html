@@ -311,7 +311,46 @@ footer {
       </p>
     </div>
 
-    <div style="background:white;padding:18px;border-radius:16px;margin:18px 0;">
+    
+<div style="background:#f3f0ff;padding:20px;border-radius:16px;margin:18px 0;">
+  <h3>🩺 EDD Calculator Using USG</h3>
+  <p>Don't remember your LMP? Calculate your EDD using your ultrasound report.</p>
+
+  <label for="usgDate" style="display:block;margin:12px 0 6px;font-weight:600;">
+    Date of Ultrasound (AD)
+  </label>
+  <input type="date" id="usgDate"
+    style="width:100%;padding:13px;border:1px solid #ddd;border-radius:10px;font-size:16px;box-sizing:border-box;">
+
+  <label for="usgWeeks" style="display:block;margin:12px 0 6px;font-weight:600;">
+    Gestational Age on Scan (Weeks)
+  </label>
+  <input type="number" id="usgWeeks" min="0" max="42" placeholder="e.g. 12"
+    style="width:100%;padding:13px;border:1px solid #ddd;border-radius:10px;font-size:16px;box-sizing:border-box;">
+
+  <label for="usgDays" style="display:block;margin:12px 0 6px;font-weight:600;">
+    Additional Days
+  </label>
+  <input type="number" id="usgDays" min="0" max="6" value="0"
+    style="width:100%;padding:13px;border:1px solid #ddd;border-radius:10px;font-size:16px;box-sizing:border-box;">
+
+  <button onclick="calculateUSGEDD()"
+    style="width:100%;padding:14px;margin-top:15px;background:#8065a8;color:white;border:0;border-radius:10px;font-size:16px;font-weight:600;">
+    Calculate EDD from USG
+  </button>
+
+  <div id="usgResult" style="display:none;margin-top:20px;background:white;padding:16px;border-radius:12px;">
+    <h3 style="color:#8065a8;">Your USG-Based Results</h3>
+    <p><strong>Expected Delivery Date:</strong> <span id="usgEddOutput"></span></p>
+    <p><strong>Current Gestational Age:</strong> <span id="usgGaOutput"></span></p>
+    <p><strong>Trimester:</strong> <span id="usgTrimesterOutput"></span></p>
+  </div>
+
+  <p style="font-size:12px;color:#777;margin-top:15px;">
+    Use the earliest reliable ultrasound for pregnancy dating. Confirm the final EDD with your obstetrician.
+  </p>
+</div>
+
       <h3>🌸 40 Weeks of Pregnancy</h3>
       <p>Explore your baby's development and the changes in your body throughout pregnancy.</p>
       <button onclick="showPage('learn')" style="padding:12px 18px;background:#a45e78;color:white;border:0;border-radius:10px;">
@@ -389,6 +428,83 @@ function calculatePregnancy() {
   note.textContent = "Please confirm your pregnancy dating with your healthcare provider.";
   result.style.display = "block";
 }
+  
+function calculateUSGEDD() {
+  const scanInput = document.getElementById("usgDate").value;
+  const weeksInput = document.getElementById("usgWeeks").value;
+  const daysInput = document.getElementById("usgDays").value;
+
+  if (!scanInput || weeksInput === "" || daysInput === "") {
+    alert("Please enter the scan date and gestational age.");
+    return;
+  }
+
+  const scanWeeks = Number(weeksInput);
+  const scanDays = Number(daysInput);
+
+  if (
+    !Number.isInteger(scanWeeks) ||
+    !Number.isInteger(scanDays) ||
+    scanWeeks < 0 ||
+    scanWeeks > 42 ||
+    scanDays < 0 ||
+    scanDays > 6 ||
+    scanWeeks * 7 + scanDays > 294
+  ) {
+    alert("Please enter a valid gestational age.");
+    return;
+  }
+
+  const parts = scanInput.split("-").map(Number);
+  const scanDate = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
+
+  const todayLocal = new Date();
+  const today = new Date(Date.UTC(
+    todayLocal.getFullYear(),
+    todayLocal.getMonth(),
+    todayLocal.getDate()
+  ));
+
+  const elapsedDays = Math.floor((today - scanDate) / 86400000);
+
+  if (elapsedDays < 0) {
+    alert("Scan date cannot be in the future.");
+    return;
+  }
+
+  const scanAgeDays = scanWeeks * 7 + scanDays;
+  const currentAgeDays = scanAgeDays + elapsedDays;
+  const edd = new Date(scanDate);
+
+  edd.setUTCDate(edd.getUTCDate() + 280 - scanAgeDays);
+
+  const formatDate = date => date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC"
+  });
+
+  const currentWeeks = Math.floor(currentAgeDays / 7);
+  const currentDays = currentAgeDays % 7;
+
+  let trimester;
+  if (currentAgeDays < 98) {
+    trimester = "First Trimester";
+  } else if (currentAgeDays < 196) {
+    trimester = "Second Trimester";
+  } else {
+    trimester = "Third Trimester";
+  }
+
+  document.getElementById("usgEddOutput").textContent = formatDate(edd);
+  document.getElementById("usgGaOutput").textContent =
+    currentWeeks + " weeks " + currentDays + " days";
+  document.getElementById("usgTrimesterOutput").textContent = trimester;
+
+  document.getElementById("usgResult").style.display = "block";
+}
+
 </script>
 
 <!-- LEARN -->
