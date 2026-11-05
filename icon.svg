@@ -1,0 +1,25 @@
+
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="110"
+        fill="#a45e78"/>
+  <circle cx="256" cy="195" r="95"
+          fill="#f9e8ed"/>
+  <path d="M256 110
+           C190 110 165 175 180 235
+           C195 295 235 335 256 355
+           C277 335 317 295 332 235
+           C347 175 322 110 256 110Z"
+        fill="#fff"/>
+  <path d="M256 355
+           C220 325 165 330 165 390
+           C165 440 215 460 256 420
+           C297 460 347 440 347 390
+           C347 330 292 325 256 355Z"
+        fill="#f4c6d4"/>
+  <text x="256" y="485"
+        font-size="34"
+        text-anchor="middle"
+        fill="white"
+        font-family="Arial">GC</text>
+</svg>
