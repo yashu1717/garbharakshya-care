@@ -271,28 +271,125 @@ footer {
 
 </section>
 
+
 <!-- PREGNANCY -->
 <section id="pregnancy" class="page">
-  <h2 class="section-title">My Pregnancy 🤰</h2>
+  <div style="padding:20px 0;">
+    <h2>My Pregnancy 🤰</h2>
+    <p>Calculate your expected delivery date and follow your pregnancy journey.</p>
 
-  <div class="feature">
-    <h3>Calculate Your Due Date</h3>
-    <p>Find your estimated delivery date and pregnancy week.</p>
-    <button onclick="alert('EDD calculator coming in the next step!')">
-      Calculate EDD
-    </button>
-  </div>
+    <div style="background:#fff4f7;padding:20px;border-radius:16px;margin:18px 0;">
+      <h3>📅 Pregnancy Due Date Calculator</h3>
+      <p>Enter the first day of your last menstrual period (LMP).</p>
 
-  <div class="feature">
-    <h3>40 Weeks of Pregnancy</h3>
-    <p>Follow your baby's growth and your body changes week by week.</p>
-  </div>
+      <label for="lmpDate" style="display:block;margin:12px 0 6px;font-weight:600;">
+        Last Menstrual Period (AD)
+      </label>
+      <input
+        type="date"
+        id="lmpDate"
+        style="width:100%;padding:13px;border:1px solid #ddd;border-radius:10px;font-size:16px;box-sizing:border-box;"
+      >
 
-  <div class="feature">
-    <h3>Pregnancy Monitoring</h3>
-    <p>Keep track of important appointments and pregnancy milestones.</p>
+      <button
+        onclick="calculatePregnancy()"
+        style="width:100%;padding:14px;margin-top:15px;background:#a45e78;color:white;border:0;border-radius:10px;font-size:16px;font-weight:600;"
+      >
+        Calculate My Pregnancy
+      </button>
+
+      <div id="pregnancyResult" style="display:none;margin-top:20px;background:white;padding:16px;border-radius:12px;">
+        <h3 style="color:#a45e78;">Your Pregnancy Results</h3>
+        <p><strong>Expected Delivery Date:</strong> <span id="eddResult"></span></p>
+        <p><strong>Gestational Age:</strong> <span id="gaResult"></span></p>
+        <p><strong>Trimester:</strong> <span id="trimesterResult"></span></p>
+        <p id="pregnancyNote" style="font-size:13px;color:#666;"></p>
+      </div>
+
+      <p style="font-size:12px;color:#777;margin-top:15px;">
+        This is an estimate based on a 28-day menstrual cycle. Your doctor may adjust pregnancy dating based on ultrasound findings and your clinical history.
+      </p>
+    </div>
+
+    <div style="background:white;padding:18px;border-radius:16px;margin:18px 0;">
+      <h3>🌸 40 Weeks of Pregnancy</h3>
+      <p>Explore your baby's development and the changes in your body throughout pregnancy.</p>
+      <button onclick="showPage('learn')" style="padding:12px 18px;background:#a45e78;color:white;border:0;border-radius:10px;">
+        Explore Pregnancy Education
+      </button>
+    </div>
+
+    <div style="background:white;padding:18px;border-radius:16px;margin:18px 0;">
+      <h3>📋 Pregnancy Monitoring</h3>
+      <p>Your pregnancy monitoring tools and reminders will be added here.</p>
+    </div>
   </div>
 </section>
+
+<script>
+function calculatePregnancy() {
+  const input = document.getElementById("lmpDate").value;
+  const result = document.getElementById("pregnancyResult");
+  const note = document.getElementById("pregnancyNote");
+
+  if (!input) {
+    alert("Please enter your last menstrual period date.");
+    return;
+  }
+
+  const parts = input.split("-").map(Number);
+  const lmp = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
+
+  const todayLocal = new Date();
+  const today = new Date(Date.UTC(
+    todayLocal.getFullYear(),
+    todayLocal.getMonth(),
+    todayLocal.getDate()
+  ));
+
+  const difference = Math.floor((today - lmp) / 86400000);
+
+  if (difference < 0) {
+    alert("LMP date cannot be in the future.");
+    return;
+  }
+
+  if (difference > 294) {
+    alert("Please check your LMP date. The pregnancy duration is more than 42 weeks.");
+    return;
+  }
+
+  const edd = new Date(lmp);
+  edd.setUTCDate(edd.getUTCDate() + 280);
+
+  const formatDate = date => date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC"
+  });
+
+  const weeks = Math.floor(difference / 7);
+  const days = difference % 7;
+
+  let trimester;
+  if (difference < 98) {
+    trimester = "First Trimester";
+  } else if (difference < 196) {
+    trimester = "Second Trimester";
+  } else {
+    trimester = "Third Trimester";
+  }
+
+  document.getElementById("eddResult").textContent = formatDate(edd);
+  document.getElementById("gaResult").textContent =
+    weeks + " weeks " + days + " days";
+  document.getElementById("trimesterResult").textContent = trimester;
+
+  note.textContent = "Please confirm your pregnancy dating with your healthcare provider.";
+  result.style.display = "block";
+}
+</script>
 
 <!-- LEARN -->
 <section id="learn" class="page">
