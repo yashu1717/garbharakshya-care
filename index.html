@@ -2,136 +2,400 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#a45e78">
+<title>Garbharakhsya Pregnancy Care | Dr. Yashu</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon.svg">
 
-  <title>Garbharakhsya Care | Dr. Yashu</title>
+<style>
+* { box-sizing: border-box; }
 
-  <meta name="theme-color" content="#a45e78">
-  <meta name="description" content="Your personal pregnancy care companion">
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #faf7f7;
+  color: #40363b;
+  padding-bottom: 85px;
+}
 
-  <link rel="manifest" href="./manifest.json">
-  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+header {
+  background: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px #00000008;
+}
 
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Garbharakhsya">
+.brand h1 {
+  margin: 0;
+  font-size: 21px;
+  color: #985c75;
+}
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #faf7f4;
-      color: #393333;
-    }
+.brand p {
+  margin: 5px 0 0;
+  font-size: 13px;
+  color: #888;
+}
 
-    header {
-      background: white;
-      padding: 22px;
-      text-align: center;
-    }
+.container {
+  max-width: 650px;
+  margin: auto;
+  padding: 18px;
+}
 
-    header h1 {
-      color: #a45e78;
-      margin: 0;
-    }
+.welcome {
+  padding: 20px 5px;
+}
 
-    main {
-      max-width: 600px;
-      margin: auto;
-      padding: 20px;
-    }
+.welcome h2 {
+  color: #985c75;
+  font-size: 25px;
+}
 
-    .welcome {
-      text-align: center;
-      padding: 30px 10px;
-    }
+.welcome p {
+  color: #777;
+  line-height: 1.6;
+}
 
-    .welcome h2 {
-      color: #94566d;
-      font-size: 27px;
-    }
+.hero {
+  background: linear-gradient(135deg,#f2dce5,#f9edf1);
+  padding: 24px;
+  border-radius: 18px;
+  margin-bottom: 24px;
+}
 
-    .card {
-      background: white;
-      padding: 22px;
-      margin: 16px 0;
-      border-radius: 16px;
-      box-shadow: 0 3px 15px #00000008;
-    }
+.hero h2 {
+  color: #854e67;
+  margin-top: 0;
+}
 
-    .card h3 {
-      color: #94566d;
-    }
+.hero p {
+  color: #765b66;
+  line-height: 1.6;
+}
 
-    button {
-      background: #a45e78;
-      color: white;
-      border: none;
-      padding: 13px 20px;
-      border-radius: 10px;
-      cursor: pointer;
-    }
+button {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 18px;
+  background: #a45e78;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
 
-    footer {
-      text-align: center;
-      padding: 25px;
-      color: #888;
-    }
-  </style>
+.section-title {
+  color: #985c75;
+  font-size: 19px;
+  margin: 25px 0 14px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 13px;
+}
+
+.card {
+  background: white;
+  padding: 18px 14px;
+  border-radius: 15px;
+  box-shadow: 0 3px 12px #00000007;
+  min-height: 125px;
+  cursor: pointer;
+}
+
+.card .emoji {
+  font-size: 27px;
+}
+
+.card h3 {
+  color: #92566f;
+  font-size: 15px;
+  margin-bottom: 7px;
+}
+
+.card p {
+  color: #888;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 0;
+}
+
+.feature {
+  background: white;
+  border-radius: 15px;
+  padding: 19px;
+  margin-top: 14px;
+}
+
+.feature h3 {
+  color: #92566f;
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  padding: 12px 4px;
+  box-shadow: 0 -3px 15px #0000000d;
+  z-index: 10;
+}
+
+nav button {
+  background: transparent;
+  color: #888;
+  padding: 7px;
+  font-size: 12px;
+}
+
+nav button.active {
+  color: #a45e78;
+  font-weight: bold;
+}
+
+nav span {
+  display: block;
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+footer {
+  text-align: center;
+  color: #999;
+  padding: 25px;
+  font-size: 12px;
+}
+
+</style>
 </head>
 
 <body>
 
 <header>
-  <h1>Garbharakhsya Care</h1>
-  <p>by Dr. Yashu</p>
+  <div class="brand">
+    <h1>Garbharakhsya</h1>
+    <h1>Pregnancy Care</h1>
+    <p>by Dr. Yashu</p>
+  </div>
+  <div style="font-size:25px">♡</div>
 </header>
 
-<main>
+<main class="container">
 
-  <section class="welcome">
+<!-- HOME -->
+<section id="home" class="page active">
+
+  <div class="welcome">
     <h2>Your Pregnancy, Our Care ❤️</h2>
     <p>
-      Your trusted companion throughout pregnancy.
-      Learn, monitor and connect with professional care.
+      Welcome to your pregnancy care companion.
+      Learn, monitor and take care of yourself
+      throughout your pregnancy journey.
     </p>
-  </section>
+  </div>
 
-  <section class="card">
-    <h3>🤰 My Pregnancy</h3>
-    <p>Track your pregnancy week by week.</p>
-    <button onclick="alert('Coming soon!')">Get Started</button>
-  </section>
+  <div class="hero">
+    <h2>🤰 Begin Your Pregnancy Journey</h2>
+    <p>
+      Discover your baby's development,
+      understand your body and receive
+      reliable pregnancy guidance.
+    </p>
+    <button onclick="showPage('pregnancy')">
+      Explore My Pregnancy
+    </button>
+  </div>
 
-  <section class="card">
-    <h3>📚 Pregnancy Education</h3>
-    <p>Explore pregnancy information and baby development.</p>
-  </section>
+  <h2 class="section-title">Explore Your Care</h2>
 
-  <section class="card">
-    <h3>👩‍⚕️ Doctor Consultation</h3>
-    <p>Connect with a healthcare professional.</p>
-  </section>
+  <div class="grid">
 
-  <section class="card">
+    <div class="card" onclick="showPage('pregnancy')">
+      <div class="emoji">🤰</div>
+      <h3>My Pregnancy</h3>
+      <p>EDD calculator and pregnancy tracking</p>
+    </div>
+
+    <div class="card" onclick="showPage('learn')">
+      <div class="emoji">👶</div>
+      <h3>Baby's Growth</h3>
+      <p>Explore your baby's development</p>
+    </div>
+
+    <div class="card" onclick="showPage('learn')">
+      <div class="emoji">📚</div>
+      <h3>Learn & Explore</h3>
+      <p>Pregnancy education and health tips</p>
+    </div>
+
+    <div class="card" onclick="showPage('profile')">
+      <div class="emoji">👩‍⚕️</div>
+      <h3>Doctor Consultation</h3>
+      <p>Professional pregnancy consultation</p>
+    </div>
+
+  </div>
+
+  <h2 class="section-title">Specialized Services</h2>
+
+  <div class="feature">
     <h3>⭐ High-Risk Pregnancy Care</h3>
-    <p>Explore specialized pregnancy monitoring and follow-up.</p>
-  </section>
+    <p>
+      Specialized monitoring, education and
+      follow-up support for complicated pregnancies.
+    </p>
+    <button onclick="showPage('profile')">Explore Services</button>
+  </div>
+
+  <div class="feature">
+    <h3>🔔 Pregnancy Reminders</h3>
+    <p>Stay informed about important pregnancy milestones.</p>
+  </div>
+
+</section>
+
+<!-- PREGNANCY -->
+<section id="pregnancy" class="page">
+  <h2 class="section-title">My Pregnancy 🤰</h2>
+
+  <div class="feature">
+    <h3>Calculate Your Due Date</h3>
+    <p>Find your estimated delivery date and pregnancy week.</p>
+    <button onclick="alert('EDD calculator coming in the next step!')">
+      Calculate EDD
+    </button>
+  </div>
+
+  <div class="feature">
+    <h3>40 Weeks of Pregnancy</h3>
+    <p>Follow your baby's growth and your body changes week by week.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Pregnancy Monitoring</h3>
+    <p>Keep track of important appointments and pregnancy milestones.</p>
+  </div>
+</section>
+
+<!-- LEARN -->
+<section id="learn" class="page">
+  <h2 class="section-title">Learn & Explore 📚</h2>
+
+  <div class="feature">
+    <h3>Baby Development</h3>
+    <p>Understand how your baby grows throughout pregnancy.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Nutrition in Pregnancy</h3>
+    <p>Learn about healthy eating and essential nutrients.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Warning Signs</h3>
+    <p>Recognize symptoms that need prompt medical assessment.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Self-Care & Lifestyle</h3>
+    <p>Healthy habits for a safer pregnancy journey.</p>
+  </div>
+</section>
+
+<!-- PROFILE -->
+<section id="profile" class="page">
+  <h2 class="section-title">Your Care & Profile ❤️</h2>
+
+  <div class="feature">
+    <h3>Welcome to Garbharakhsya Care</h3>
+    <p>Registration will be available later. You can explore the app without an account.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Doctor Consultation</h3>
+    <p>Online and in-person consultation services.</p>
+  </div>
+
+  <div class="feature">
+    <h3>High-Risk Pregnancy Subscription</h3>
+    <p>Specialized pregnancy care plans will be introduced in a future update.</p>
+  </div>
+
+  <div class="feature">
+    <h3>About Dr. Yashu</h3>
+    <p>Obstetrician & Gynaecologist</p>
+  </div>
+</section>
 
 </main>
 
 <footer>
-  Garbharakhsya Care © 2026 | Dr. Yashu
+  Garbharakhsya Pregnancy Care<br>
+  by Dr. Yashu © 2026
 </footer>
 
+<nav>
+  <button class="active" onclick="showPage('home',this)">
+    <span>⌂</span>Home
+  </button>
+  <button onclick="showPage('pregnancy',this)">
+    <span>🤰</span>Pregnancy
+  </button>
+  <button onclick="showPage('learn',this)">
+    <span>📖</span>Learn
+  </button>
+  <button onclick="showPage('profile',this)">
+    <span>♡</span>Profile
+  </button>
+</nav>
+
 <script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js")
-        .then(() => console.log("App service worker registered"))
-        .catch(error => console.error("Service worker error:", error));
-    });
+function showPage(page,button) {
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.remove('active');
+  });
+
+  document.getElementById(page).classList.add('active');
+
+  document.querySelectorAll('nav button').forEach(b => {
+    b.classList.remove('active');
+  });
+
+  if(button) {
+    button.classList.add('active');
+  } else {
+    const buttons = document.querySelectorAll('nav button');
+    if(page === 'pregnancy') buttons[1].classList.add('active');
+    if(page === 'learn') buttons[2].classList.add('active');
+    if(page === 'profile') buttons[3].classList.add('active');
+    if(page === 'home') buttons[0].classList.add('active');
   }
+
+  window.scrollTo(0,0);
+}
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js");
+  });
+}
 </script>
 
 </body>
