@@ -184,6 +184,7 @@ footer {
 }
 
 </style>
+  <script src="https://cdn.jsdelivr.net/npm/nepali-date-converter/dist/nepali-date-converter.umd.min.js"></script>
 </head>
 
 <body>
@@ -282,11 +283,24 @@ footer {
       <h3>📅 Pregnancy Due Date Calculator</h3>
       <p>Enter the first day of your last menstrual period (LMP).</p>
 
-      <label for="lmpDate" style="display:block;margin:12px 0 6px;font-weight:600;">
-        Last Menstrual Period (AD)
-      </label>
+      
+<label for="lmpCalendar" style="display:block;margin:12px 0 6px;font-weight:600;">
+  Select Calendar
+</label>
+<select id="lmpCalendar" onchange="updateLMPCalendar()"
+  style="width:100%;padding:13px;border:1px solid #ddd;border-radius:10px;font-size:16px;">
+  <option value="AD">AD – English Calendar</option>
+  <option value="BS">BS – Nepali Calendar</option>
+</select>
+
+<label id="lmpDateLabel" for="lmpDate"
+  style="display:block;margin:12px 0 6px;font-weight:600;">
+  Last Menstrual Period (AD)
+</label>
+
       <input
-        type="date"
+       type="text"
+placeholder="YYYY-MM-DD"
         id="lmpDate"
         style="width:100%;padding:13px;border:1px solid #ddd;border-radius:10px;font-size:16px;box-sizing:border-box;"
       >
