@@ -298,12 +298,16 @@ footer {
   Last Menstrual Period (AD)
 </label>
 
-      <input
-       type="text"
-placeholder="YYYY-MM-DD"
-        id="lmpDate"
-        style="width:100%;padding:13px;border:1px solid #ddd;border-radius:10px;font-size:16px;box-sizing:border-box;"
-      >
+      <div id="lmpDatePicker" style="background:white;border:1px solid #eadde2;border-radius:12px;padding:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          <button type="button" onclick="changeLMPMonth(-1)" style="padding:9px 13px;">‹</button>
+          <strong id="lmpCalendarTitle" style="color:#854e67;text-align:center;">Nepali calendar</strong>
+          <button type="button" onclick="changeLMPMonth(1)" style="padding:9px 13px;">›</button>
+        </div>
+        <div id="lmpCalendarGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:12px;text-align:center;"></div>
+        <p id="lmpSelectedDate" style="font-size:13px;color:#765b66;margin:12px 2px 2px;">Select your LMP date from the calendar.</p>
+        <input type="hidden" id="lmpDate">
+      </div>
 
       <button
         onclick="calculatePregnancy()"
@@ -314,7 +318,8 @@ placeholder="YYYY-MM-DD"
 
       <div id="pregnancyResult" style="display:none;margin-top:20px;background:white;padding:16px;border-radius:12px;">
         <h3 style="color:#a45e78;">Your Pregnancy Results</h3>
-        <p><strong>Expected Delivery Date:</strong> <span id="eddResult"></span></p>
+        <p><strong>Expected Delivery Date (AD):</strong> <span id="eddResult"></span></p>
+        <p><strong>Expected Delivery Date (BS):</strong> <span id="eddBSResult"></span></p>
         <p><strong>Gestational Age:</strong> <span id="gaResult"></span></p>
         <p><strong>Trimester:</strong> <span id="trimesterResult"></span></p>
         <p id="pregnancyNote" style="font-size:13px;color:#666;"></p>
@@ -380,69 +385,169 @@ placeholder="YYYY-MM-DD"
 </section>
 
 <script>
+// Nepali date conversion and calendar helpers
+const NepaliDateClass = window.NepaliDate;
+const nepaliMonthNames = [
+  "Baisakh","Jestha","Ashadh","Shrawan","Bhadra","Ashwin",
+  "Kartik","Mangsir","Poush","Magh","Falgun","Chaitra"
+];
+const weekNames = ["आइत","सोम","मंगल","बुध","बिही","शुक्र","शनि"];
+let lmpCalendarYear, lmpCalendarMonth, selectedLMPDate = null;
+
+function makeNepaliDate(year, month, day) {
+  if (typeof NepaliDateClass !== "function") {
+    throw new Error("Nepali date converter did not load. Please check your internet connection and reload.");
+  }
+  return new NepaliDateClass(year, month, day);
+}
+function getBSParts(adDate) {
+  const nd = new NepaliDateClass(adDate);
+  return { year: nd.getYear(), month: nd.getMonth(), day: nd.getDate() };
+}
+function getADDate(bsYear, bsMonth, bsDay) {
+  const nd = makeNepaliDate(bsYear, bsMonth, bsDay);
+  const value = nd.getEnglishDate();
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) throw new Error("Could not convert the selected Nepali date.");
+  return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+}
+function formatAD(date) {
+  return date.toLocaleDateString("en-GB", {
+    day:"2-digit", month:"long", year:"numeric", timeZone:"UTC"
+  });
+}
+function formatBS(date) {
+  const p = getBSParts(date);
+  return p.day + " " + nepaliMonthNames[p.month] + " " + p.year;
+}
+function updateLMPCalendar() {
+  const mode = document.getElementById("lmpCalendar").value;
+  const now = new Date();
+  const todayUTC = new Date(Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()));
+  if (mode === "BS") {
+    const currentBS = getBSParts(todayUTC);
+    lmpCalendarYear = currentBS.year;
+    lmpCalendarMonth = currentBS.month;
+  } else {
+    lmpCalendarYear = todayUTC.getUTCFullYear();
+    lmpCalendarMonth = todayUTC.getUTCMonth();
+  }
+  document.getElementById("lmpDateLabel").textContent =
+    mode === "BS" ? "Last Menstrual Period (BS – Nepali Calendar)" :
+                    "Last Menstrual Period (AD – English Calendar)";
+  if (selectedLMPDate) {
+    const p = mode === "BS" ? getBSParts(selectedLMPDate) : null;
+    document.getElementById("lmpSelectedDate").textContent =
+      mode === "BS" ? "Selected: " + p.day + " " + nepaliMonthNames[p.month] + " " + p.year :
+      "Selected: " + formatAD(selectedLMPDate);
+  }
+  renderLMPCalendar();
+}
+function initLMPCalendar() {
+  if (!NepaliDateClass) {
+    document.getElementById("lmpCalendarTitle").textContent = "Calendar unavailable";
+    document.getElementById("lmpCalendarGrid").textContent =
+      "Nepali calendar could not load. Please refresh when internet is available.";
+    return;
+  }
+  const now = new Date();
+  const todayUTC = new Date(Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()));
+  const bs = getBSParts(todayUTC);
+  lmpCalendarYear = bs.year;
+  lmpCalendarMonth = bs.month;
+  renderLMPCalendar();
+}
+function changeLMPMonth(offset) {
+  if (document.getElementById("lmpCalendar").value === "BS") {
+    lmpCalendarMonth += offset;
+    if (lmpCalendarMonth < 0) { lmpCalendarMonth = 11; lmpCalendarYear--; }
+    if (lmpCalendarMonth > 11) { lmpCalendarMonth = 0; lmpCalendarYear++; }
+  } else {
+    const d = new Date(Date.UTC(lmpCalendarYear,lmpCalendarMonth + offset,1));
+    lmpCalendarYear = d.getUTCFullYear();
+    lmpCalendarMonth = d.getUTCMonth();
+  }
+  renderLMPCalendar();
+}
+function renderLMPCalendar() {
+  const mode = document.getElementById("lmpCalendar").value;
+  const grid = document.getElementById("lmpCalendarGrid");
+  const title = document.getElementById("lmpCalendarTitle");
+  if (!grid || !NepaliDateClass) return;
+  grid.innerHTML = "";
+  if (mode === "BS") {
+    title.textContent = nepaliMonthNames[lmpCalendarMonth] + " " + lmpCalendarYear;
+    weekNames.forEach(day => {
+      const el = document.createElement("div");
+      el.textContent = day; el.style.cssText = "font-size:11px;font-weight:bold;color:#987080;padding:5px 0;";
+      grid.appendChild(el);
+    });
+    const firstAD = getADDate(lmpCalendarYear,lmpCalendarMonth,1);
+    const offset = firstAD.getUTCDay();
+    let daysInMonth = 0;
+    for (let d=1; d<=32; d++) {
+      try {
+        const test = makeNepaliDate(lmpCalendarYear,lmpCalendarMonth,d);
+        if (test.getYear()===lmpCalendarYear && test.getMonth()===lmpCalendarMonth && test.getDate()===d) daysInMonth=d;
+        else break;
+      } catch(e) { break; }
+    }
+    for(let i=0;i<offset;i++) grid.appendChild(document.createElement("span"));
+    for(let day=1;day<=daysInMonth;day++) addLMPDay(grid,day,getADDate(lmpCalendarYear,lmpCalendarMonth,day),true);
+  } else {
+    const first = new Date(Date.UTC(lmpCalendarYear,lmpCalendarMonth,1));
+    title.textContent = first.toLocaleDateString("en-US",{month:"long",year:"numeric",timeZone:"UTC"});
+    ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(day => {
+      const el=document.createElement("div");
+      el.textContent=day; el.style.cssText="font-size:11px;font-weight:bold;color:#987080;padding:5px 0;";
+      grid.appendChild(el);
+    });
+    const offset=first.getUTCDay();
+    const days=new Date(Date.UTC(lmpCalendarYear,lmpCalendarMonth+1,0)).getUTCDate();
+    for(let i=0;i<offset;i++) grid.appendChild(document.createElement("span"));
+    for(let day=1;day<=days;day++) addLMPDay(grid,day,new Date(Date.UTC(lmpCalendarYear,lmpCalendarMonth,day)),false);
+  }
+}
+function addLMPDay(grid,day,adDate,isBS) {
+  const b=document.createElement("button");
+  b.type="button"; b.textContent=day;
+  b.style.cssText="padding:9px 2px;border-radius:8px;background:#f8f1f4;color:#51434a;font-size:13px;";
+  if(selectedLMPDate && selectedLMPDate.getTime()===adDate.getTime()) b.style.background="#a45e78";
+  b.onclick=()=> {
+    selectedLMPDate=adDate;
+    document.getElementById("lmpDate").value=adDate.toISOString().slice(0,10);
+    document.getElementById("lmpSelectedDate").textContent=isBS
+      ? "Selected: "+day+" "+nepaliMonthNames[lmpCalendarMonth]+" "+lmpCalendarYear+" BS"
+      : "Selected: "+formatAD(adDate)+" AD";
+    renderLMPCalendar();
+  };
+  grid.appendChild(b);
+}
 function calculatePregnancy() {
   const input = document.getElementById("lmpDate").value;
   const result = document.getElementById("pregnancyResult");
   const note = document.getElementById("pregnancyNote");
-
-  if (!input) {
-    alert("Please enter your last menstrual period date.");
+  if (!input || !selectedLMPDate) {
+    alert("Please select your LMP date from the calendar.");
     return;
   }
-
-  const parts = input.split("-").map(Number);
-  const lmp = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
-
-  const todayLocal = new Date();
-  const today = new Date(Date.UTC(
-    todayLocal.getFullYear(),
-    todayLocal.getMonth(),
-    todayLocal.getDate()
-  ));
-
-  const difference = Math.floor((today - lmp) / 86400000);
-
-  if (difference < 0) {
-    alert("LMP date cannot be in the future.");
-    return;
-  }
-
-  if (difference > 294) {
-    alert("Please check your LMP date. The pregnancy duration is more than 42 weeks.");
-    return;
-  }
-
+  const lmp = selectedLMPDate;
+  const now = new Date();
+  const today = new Date(Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()));
+  const difference = Math.floor((today-lmp)/86400000);
+  if (difference < 0) { alert("LMP date cannot be in the future."); return; }
+  if (difference > 294) { alert("Please check your LMP date. The pregnancy duration is more than 42 weeks."); return; }
   const edd = new Date(lmp);
-  edd.setUTCDate(edd.getUTCDate() + 280);
-
-  const formatDate = date => date.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC"
-  });
-
-  const weeks = Math.floor(difference / 7);
-  const days = difference % 7;
-
-  let trimester;
-  if (difference < 98) {
-    trimester = "First Trimester";
-  } else if (difference < 196) {
-    trimester = "Second Trimester";
-  } else {
-    trimester = "Third Trimester";
-  }
-
-  document.getElementById("eddResult").textContent = formatDate(edd);
-  document.getElementById("gaResult").textContent =
-    weeks + " weeks " + days + " days";
-  document.getElementById("trimesterResult").textContent = trimester;
-
-  note.textContent = "Please confirm your pregnancy dating with your healthcare provider.";
-  result.style.display = "block";
+  edd.setUTCDate(edd.getUTCDate()+280);
+  const weeks=Math.floor(difference/7), days=difference%7;
+  const trimester=difference<98?"First Trimester":difference<196?"Second Trimester":"Third Trimester";
+  document.getElementById("eddResult").textContent=formatAD(edd);
+  document.getElementById("eddBSResult").textContent=formatBS(edd)+" BS";
+  document.getElementById("gaResult").textContent=weeks+" weeks "+days+" days";
+  document.getElementById("trimesterResult").textContent=trimester;
+  note.textContent="Please confirm your pregnancy dating with your healthcare provider.";
+  result.style.display="block";
 }
-  
 function calculateUSGEDD() {
   const scanInput = document.getElementById("usgDate").value;
   const weeksInput = document.getElementById("usgWeeks").value;
@@ -617,6 +722,8 @@ function showPage(page,button) {
 
   window.scrollTo(0,0);
 }
+
+window.addEventListener("load", initLMPCalendar);
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
